@@ -101,6 +101,9 @@ module.exports = vuxLoader.merge(webpackConfig, {
     {
       name: 'less-theme',
       path: 'src/assets/css/vux-theme.less' // 相对项目根目录路径
+    },
+    {
+      name: 'duplicate-style'
     }
   ]
 })

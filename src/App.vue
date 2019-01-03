@@ -28,14 +28,15 @@ export default {
 }
 </script>
 
-<style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #333333;
-  background-color: rgb(242,242,245);
-  height: 100%;
-}
+<style lang="less">
+  @import '~vux/src/styles/reset.less';
+  #app {
+    font-family: 'Avenir', Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-align: center;
+    color: #333333;
+    background-color: #F2F4F7;
+    height: 100%;
+  }
 </style>

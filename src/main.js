@@ -11,6 +11,7 @@ import './utils/filter'
 import FastClick from 'fastclick'
 import NP from 'number-precision'
 import './assets/css/reset.css'
+import './assets/css/vux-reset.css'
 import { DatetimePlugin, ConfirmPlugin, LoadingPlugin, ToastPlugin } from 'vux'
 
 import VConsole from 'vconsole'

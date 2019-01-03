@@ -114,3 +114,13 @@ Vue.filter('longStrFormat', function (item, n) {
   }
   return item
 })
+
+// 分钟转化为 "xx小时xx分钟"
+Vue.filter('minuteFormat', function (value) {
+  var min = isNaN(parseInt(value)) ? 0 : parseInt(value)
+
+  var hour = Math.floor(NP.divide(min, 60))
+  var sec = NP.minus(min, NP.times(hour, 60))
+
+  return hour + '小时' + sec + '分钟'
+})
