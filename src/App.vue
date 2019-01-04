@@ -31,7 +31,8 @@ export default {
 <style lang="less">
   @import '~vux/src/styles/reset.less';
   #app {
-    font-family: 'Avenir', Helvetica, Arial, sans-serif;
+    font-family: San Francisco, 'Avenir', Helvetica, Arial, sans-serif;
+    /*font-family: 'Avenir', Helvetica, Arial, sans-serif;*/
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-align: center;

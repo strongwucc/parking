@@ -89,7 +89,7 @@ export default {
     bottom: 0;
     background-color: #d2d5da;
     .finished {
-      background-color: #B6B7BA;
+      background-color: #f2f2f2;
       height: 30px;
       display: flex;
       justify-content: flex-end;

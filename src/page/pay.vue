@@ -50,6 +50,8 @@
             <div class="check-icon"><img src="../assets/img/icon_arrow_right@2x.png"/></div>
           </li>
         </ul>
+        <div class="line-1"></div>
+        <div class="line-2"></div>
       </div>
     </div>
     <div class="action-area">
@@ -256,6 +258,19 @@ export default {
               }
             }
           }
+        }
+        .line-1, .line-2 {
+          width:329px;
+          height:0.5px;
+          background-color: #e7e7e7;
+          position: relative;
+          left: 46px;
+        }
+        .line-1 {
+          top: -122px;
+        }
+        .line-2 {
+          top: -61px;
         }
       }
     }

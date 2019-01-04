@@ -186,11 +186,10 @@ export default {
       line-height: 20px;
       color: rgba(56, 161, 255, 1);
       .icon {
-        margin-left: 5px;
+        /*margin-left: 5px;*/
         img {
           width: 20px;
           height: 20px;
-          transform: translate(0 -1px);
         }
       }
     }
