@@ -1,6 +1,9 @@
 <template>
   <transition name="slide">
     <div class="keyboard" v-show="visible" @click.stop="">
+      <div class="finished">
+        <div class="finish-btn" @click="finishPutting">完成</div>
+      </div>
       <ul class="letter-list" v-if="type === 1">
         <li class="letter" v-for="(letter, index) in letterList" :key="index">
           <div @touchstart.stop="touchStart(index)" @touchend.stop="touchEnd(index, 1)" :class="{light: currentIndex === index && highlight}">{{letter}}</div>
@@ -38,77 +41,41 @@ export default {
         'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L',
         'Z', 'X', 'C', 'V', 'B', 'N', 'M'
       ],
-      highlight: false,
-      currentIndex: '',
-      licence: '',
-      finished: false
+      currentIndex: 0,
+      highlight: false
     }
   },
   props: {
     visible: false,
-    electric: false,
-    puttingIndex: {
-      type: Number,
-      default: -1
-    }
+    electric: false
   },
   methods: {
     touchStart (index) {
-      if (this.finished) {
-        return false
-      }
-      if (this.puttingIndex === -1 && this.electric === false && this.licence.length >= 7) {
-        return false
-      } else if (this.puttingIndex === -1 && this.electric && this.licence.length >= 8) {
-        return false
-      }
       this.currentIndex = index
       this.highlight = true
     },
 
     touchEnd (index, type) {
-      if (this.finished) {
-        return false
-      }
-      if ((this.puttingIndex === -1 && this.electric === false && this.licence.length >= 7) || (this.puttingIndex === -1 && this.electric && this.licence.length >= 8)) {
-        return false
-      }
       this.highlight = false
 
-      if (this.puttingIndex !== -1) {
-        let appended = ''
-        if (type === 0) {
-          appended = this.chineseList[this.currentIndex].toString()
-        } else if (type === 1) {
-          appended = this.letterList[this.currentIndex].toString()
-        }
-        console.log(appended)
-        this.licence = this.licence.substring(0, this.puttingIndex) + appended + this.licence.substr(this.puttingIndex + 1)
-      } else {
-        if (type === 0) {
-          this.licence += this.chineseList[this.currentIndex].toString()
-        } else if (type === 1) {
-          this.licence += this.letterList[this.currentIndex].toString()
-        }
+      let appended = ''
+
+      if (type === 0) {
+        appended = this.chineseList[this.currentIndex].toString()
+      } else if (type === 1) {
+        appended = this.letterList[this.currentIndex].toString()
       }
 
-      if ((this.electric === false && this.licence.length === 7) || (this.electric && this.licence.length === 8)) {
-        this.$emit('licenceFinished')
-      }
-
-      this.$emit('licenceCompleted', this.licence)
+      this.$emit('licenceCompleted', appended)
+    },
+    finishPutting () {
+      this.$emit('finishPutting')
     },
     switchType () {
       this.type = this.type === 0 ? 1 : 0
     },
     rollBack () {
-      if (this.finished) {
-        return false
-      }
-      let licence = this.licence
-      licence = licence.substr(0, licence.length - 1)
-      this.licence = licence
-      this.$emit('licenceCompleted', this.licence)
+      this.$emit('rollBack')
     }
   }
 }
@@ -121,6 +88,19 @@ export default {
     width: 100%;
     bottom: 0;
     background-color: #d2d5da;
+    .finished {
+      background-color: #B6B7BA;
+      height: 30px;
+      display: flex;
+      justify-content: flex-end;
+      .finish-btn {
+        width: 15%;
+        padding: 0 5px;
+        line-height: 30px;
+        font-size: 14px;
+        color: #38A1FF;
+      }
+    }
     .letter-list, .chinese-list{
       padding: 15px 5px 5px 5px;
       display: flex;

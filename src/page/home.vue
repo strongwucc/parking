@@ -8,18 +8,18 @@
       <div class="sub-notice">例如：沪A12345</div>
       <div class="numbers">
         <ul>
-          <li @click.stop="showKeyboard(0)" :class="{cur: puttingIndex === 0}">{{licence.substr(0, 1)}}</li>
-          <li @click.stop="showKeyboard(1)" :class="{cur: puttingIndex === 1}">{{licence.substr(1, 1)}}</li>
-          <li @click.stop="showKeyboard(2)" :class="{cur: puttingIndex === 2}">{{licence.substr(2, 1)}}</li>
-          <li @click.stop="showKeyboard(3)" :class="{cur: puttingIndex === 3}">{{licence.substr(3, 1)}}</li>
-          <li @click.stop="showKeyboard(4)" :class="{cur: puttingIndex === 4}">{{licence.substr(4, 1)}}</li>
-          <li @click.stop="showKeyboard(5)" :class="{cur: puttingIndex === 5}">{{licence.substr(5, 1)}}</li>
-          <li @click.stop="showKeyboard(6)" :class="{cur: puttingIndex === 6}">{{licence.substr(6, 1)}}</li>
+          <li @click.stop="showKeyboard(0)" :class="{cur: puttingIndex === 0}">{{licence[0]}}</li>
+          <li @click.stop="showKeyboard(1)" :class="{cur: puttingIndex === 1}">{{licence[1]}}</li>
+          <li @click.stop="showKeyboard(2)" :class="{cur: puttingIndex === 2}">{{licence[2]}}</li>
+          <li @click.stop="showKeyboard(3)" :class="{cur: puttingIndex === 3}">{{licence[3]}}</li>
+          <li @click.stop="showKeyboard(4)" :class="{cur: puttingIndex === 4}">{{licence[4]}}</li>
+          <li @click.stop="showKeyboard(5)" :class="{cur: puttingIndex === 5}">{{licence[5]}}</li>
+          <li @click.stop="showKeyboard(6)" :class="{cur: puttingIndex === 6}">{{licence[6]}}</li>
           <li class="electric" v-if="electric === false" @click.stop="switchElectric">
             <div class="add-icon"><img src="../assets/img/icon_plus@2x.png"/></div>
             <div class="add-notice">新能源</div>
           </li>
-          <li @click.stop="showKeyboard(7)" v-else :class="{cur: puttingIndex === 7}">{{licence.substr(7, 1)}}</li>
+          <li @click.stop="showKeyboard(7)" v-else :class="{cur: puttingIndex === 7}">{{licence[7]}}</li>
         </ul>
       </div>
       <div class="rule-notice">停车费</div>
@@ -31,7 +31,7 @@
       </div>
     </div>
     <div class="action-area" :class="{'query-active': queryActive}" @click.stop="doQuery">立即查询</div>
-    <keyboard @licenceCompleted="licenceCompleted" @licenceFinished="licenceFinished" :electric="electric" :putting-index="puttingIndex" :visible="licenceViewVisible"></keyboard>
+    <keyboard @finishPutting="hideKeyboard" @licenceCompleted="licenceCompleted" @rollBack="rollBack" :electric="electric" :putting-index="puttingIndex" :visible="licenceViewVisible"></keyboard>
   </div>
 </template>
 
@@ -44,11 +44,19 @@ export default {
   inject: ['reload'], // 引入方法
   data () {
     return {
-      putting: false,
-      puttingIndex: -1,
+      puttingIndex: 0,
       electric: false,
       licenceViewVisible: false,
-      licence: '',
+      licence: {
+        0: '',
+        1: '',
+        2: '',
+        3: '',
+        4: '',
+        5: '',
+        6: '',
+        7: ''
+      },
       querying: false
     }
   },
@@ -56,10 +64,14 @@ export default {
     ...mapState({
     }),
     queryActive: function () {
-      if (this.licence.length === 8 || this.licence.length === 7) {
-        return true
+      let active = true
+      for (var i = 0; i < 7; i++) {
+        if (this.licence[i] === '') {
+          active = false
+          break
+        }
       }
-      return false
+      return active
     }
   },
   watch: {
@@ -74,26 +86,40 @@ export default {
       this.showKeyboard(7)
     },
     licenceCompleted (licence) {
-      this.puttingIndex = licence.length
-      this.licence = licence
+      if (this.electric === false && this.puttingIndex > 6) {
+        return false
+      } else if (this.electric && this.puttingIndex > 7) {
+        return false
+      }
+      this.licence[this.puttingIndex] = licence
+      if (this.electric === false && this.puttingIndex <= 5) {
+        this.puttingIndex += 1
+      } else if (this.electric && this.puttingIndex <= 6) {
+        this.puttingIndex += 1
+      }
     },
     hideKeyboard () {
-      this.puttingIndex = -1
       this.licenceViewVisible = false
     },
     showKeyboard (index) {
       this.puttingIndex = index
       this.licenceViewVisible = true
     },
-    licenceFinished () {
-      this.puttingIndex = -1
-      this.licenceViewVisible = false
+    rollBack () {
+      if (this.licence[this.puttingIndex] !== '') {
+        this.licence[this.puttingIndex] = ''
+      } else {
+        if (this.puttingIndex > 0) {
+          this.puttingIndex -= 1
+          this.licence[this.puttingIndex] = ''
+        }
+      }
     },
     doQuery () {
       if (this.querying) {
         return false
       }
-      if (this.licence.length !== 8 && this.licence.length !== 7) {
+      if (this.queryActive === false) {
         return false
       }
       this.$vux.loading.show({
