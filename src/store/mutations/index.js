@@ -1,9 +1,8 @@
-// 会员信息
-import user_auth from './user/auth'
 import user_info from './user/info'
+import parking_info from './user/parking'
 const user_module = {
-  ...user_auth,
-  ...user_info
+  ...user_info,
+  ...parking_info
 }
 
 export default {

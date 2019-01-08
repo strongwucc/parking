@@ -11,7 +11,7 @@
       <div class="main">
         <div class="icon"><img src="../assets/img/img_success@2x.png"/></div>
         <div class="notice">支付成功</div>
-        <div class="amount">￥40</div>
+        <div class="amount">￥{{parkingInfo.fee}}</div>
       </div>
       <div class="detail">
         <ul>
@@ -21,7 +21,7 @@
           </li>
           <li>
             <div class="label">车牌号</div>
-            <div class="content">沪A00001</div>
+            <div class="content">{{parkingInfo.carNo}}</div>
           </li>
           <li>
             <div class="label">支付方式</div>
@@ -33,15 +33,15 @@
           </li>
           <li v-show="showMore">
             <div class="label">停车时长</div>
-            <div class="content">4小时0分钟</div>
+            <div class="content">{{parkingInfo.minutes|minuteFormat}}</div>
           </li>
           <li v-show="showMore">
             <div class="label">进场时间</div>
-            <div class="content">2018-05-02 11:24:27</div>
+            <div class="content">{{parkingInfo.inTime}}</div>
           </li>
           <li v-show="showMore">
             <div class="label">离场时间</div>
-            <div class="content">2018-05-02 11:30:27</div>
+            <div class="content">{{parkingInfo.outTime}}</div>
           </li>
         </ul>
       </div>
@@ -57,7 +57,7 @@
 </template>
 
 <script>
-import {mapState} from 'vuex'
+import {mapState, mapMutations} from 'vuex'
 export default {
   name: 'pay_success',
   components: {},
@@ -65,11 +65,14 @@ export default {
   data () {
     return {
       orderId: '',
+      orderDetail: {},
       showMore: false
     }
   },
   computed: {
     ...mapState({
+      userInfo: state => state.user.user_info,
+      parkingInfo: state => state.user.parking_info
     }),
     noticeTxt: function () {
       return this.showMore ? '收起' : '查看更多'
@@ -77,14 +80,43 @@ export default {
   },
   watch: {
   },
+  created () {
+    if (typeof this.userInfo.memberId === 'undefined') {
+      this.get_user_info()
+    }
+
+    if (typeof this.parkingInfo.carNo === 'undefined') {
+      this.get_parking_data()
+    }
+  },
   mounted () {
     if (this.$route.params.orderId) {
       this.orderId = this.$route.params.orderId
+      this.queryOrderDetail()
     }
   },
   destroyed () {
   },
   methods: {
+    ...mapMutations([
+      'get_user_info',
+      'get_parking_data'
+    ]),
+    queryOrderDetail () {
+      let postData = {
+        merOrderNum: this.orderId
+      }
+
+      this.$http.post(this.API.queryOrderDetail, postData).then(res => {
+        this.$vux.loading.hide()
+        this.paying = false
+        if (res.return_code === '0000') {
+          this.orderDetail = res.data
+        } else {
+          this.$router.push('/pay_fail/' + res.return_message)
+        }
+      })
+    }
   }
 }
 </script>

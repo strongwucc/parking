@@ -36,7 +36,7 @@
 </template>
 
 <script>
-import {mapState} from 'vuex'
+import {mapState, mapMutations} from 'vuex'
 import Keyboard from '../components/keyboard'
 export default {
   name: 'home',
@@ -76,11 +76,26 @@ export default {
   },
   watch: {
   },
+  created () {
+    let userInfo = {}
+
+    if (this.$route.query.memberId) {
+      userInfo.memberId = this.$route.query.memberId
+    }
+    if (this.$route.query.point) {
+      userInfo.point = this.$route.query.point
+    }
+    this.set_user_info(userInfo)
+  },
   mounted () {
   },
   destroyed () {
   },
   methods: {
+    ...mapMutations([
+      'set_user_info',
+      'set_parking_info'
+    ]),
     switchElectric () {
       this.electric = true
       this.showKeyboard(7)
@@ -127,17 +142,28 @@ export default {
       })
       this.querying = true
 
-      setTimeout(() => {
+      let licence = ''
+
+      for (var i = 0; i <= 7; i++) {
+        licence += this.licence[i]
+      }
+
+      this.$http.post(this.API.queryMyCarFee, {carNo: licence}).then(res => {
         this.$vux.loading.hide()
         this.querying = false
-        // this.$vux.toast.show({
-        //   type: 'text',
-        //   text: '未查询到您的停车订单',
-        //   width: '200px',
-        //   position: 'middle'
-        // })
-        this.$router.push('/pay')
-      }, 2000)
+        if (res.return_code === '0000') {
+          let parkingInfo = res.data
+          this.set_parking_info(parkingInfo)
+          this.$router.push('/pay')
+        } else {
+          this.$vux.toast.show({
+            type: 'text',
+            text: '未查询到您的停车订单',
+            width: '200px',
+            position: 'middle'
+          })
+        }
+      })
     }
   }
 }

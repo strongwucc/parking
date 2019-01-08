@@ -1,4 +1,5 @@
 import axios from 'axios'
+import qs from 'qs'
 import { baseUrl } from '../config/env'
 axios.defaults.withCredentials = false
 
@@ -30,8 +31,9 @@ export default class http {
     }
     var options = {
       url: postUrl,
-      data: data,
-      method: 'post'
+      data: qs.stringify(data),
+      method: 'post',
+      headers: { 'content-type': 'application/x-www-form-urlencoded' }
     }
     return this.request(options)
   }
@@ -43,7 +45,6 @@ export default class http {
     var promise = new Promise((resolve) => {
       axios(options)
         .then((result) => {
-          console.log(result)
           if (typeof result.data.return_code === 'undefined') {
             resolve({return_code: '5000', return_message: '系统出错啦'})
           } else {

@@ -5,13 +5,13 @@
       <div class="content">
         <div class="header">
           <div class="licence-title">车牌号</div>
-          <div class="licence">{{info.licence}}</div>
+          <div class="licence">{{parkingInfo.carNo}}</div>
         </div>
-        <div class="start-time">进场时间：{{info.startTime}}</div>
+        <div class="start-time">进场时间：{{parkingInfo.inTime}}</div>
         <div class="park-notice">停车时长</div>
         <div class="park-time">
-          <div class="time">{{info.parkTime|minuteFormat}}</div>
-          <div class="amount"><span>金额：</span><span class="money">￥{{info.amount}}</span></div>
+          <div class="time">{{parkingInfo.minutes|minuteFormat}}</div>
+          <div class="amount"><span>金额：</span><span class="money">￥{{parkingInfo.fee}}</span></div>
         </div>
       </div>
     </div>
@@ -23,7 +23,7 @@
             <div class="icon"><img src="../assets/img/icon_jifen@2x.png"/></div>
             <div class="intro">
               <div class="notice">积分抵扣</div>
-              <div class="sub-notice">200积分=1小时，当前可用800积分</div>
+              <div class="sub-notice">200积分=1小时，当前可用{{userInfo.point}}积分</div>
             </div>
             <div class="check-icon" @click.stop="switchPayMethod('score')">
               <img v-if="payMethod === 'score'" src="../assets/img/radio_default@2x.png"/>
@@ -41,14 +41,14 @@
               <img v-else src="../assets/img/radio_gray@2x.png"/>
             </div>
           </li>
-          <li>
-            <div class="icon"><img src="../assets/img/icon_youhuiquan@2x.png"/></div>
-            <div class="intro">
-              <div class="notice">优惠券抵扣</div>
-              <div class="sub-notice">当前无可用优惠券</div>
-            </div>
-            <div class="check-icon"><img src="../assets/img/icon_arrow_right@2x.png"/></div>
-          </li>
+          <!--<li>-->
+            <!--<div class="icon"><img src="../assets/img/icon_youhuiquan@2x.png"/></div>-->
+            <!--<div class="intro">-->
+              <!--<div class="notice">优惠券抵扣</div>-->
+              <!--<div class="sub-notice">当前无可用优惠券</div>-->
+            <!--</div>-->
+            <!--<div class="check-icon"><img src="../assets/img/icon_arrow_right@2x.png"/></div>-->
+          <!--</li>-->
         </ul>
         <div class="line-1"></div>
         <div class="line-2"></div>
@@ -57,15 +57,15 @@
     <div class="action-area">
       <div class="amount">
         <span>需付金额：</span>
-        <span class="money">￥{{info.amount}}</span>
+        <span class="money">￥{{parkingInfo.fee}}</span>
       </div>
-      <div class="action">确认支付</div>
+      <div class="action" @click.stop="doPay">确认支付</div>
     </div>
   </div>
 </template>
 
 <script>
-import {mapState} from 'vuex'
+import {mapState, mapMutations} from 'vuex'
 export default {
   name: 'pay',
   components: {},
@@ -78,22 +78,102 @@ export default {
         parkTime: '121',
         amount: '40'
       },
-      payMethod: 'score'
+      payMethod: 'score',
+      paying: false
     }
   },
   computed: {
     ...mapState({
+      userInfo: state => state.user.user_info,
+      parkingInfo: state => state.user.parking_info
     })
   },
   watch: {
+  },
+  created () {
+    if (typeof this.userInfo.memberId === 'undefined') {
+      this.get_user_info()
+    }
+
+    if (typeof this.parkingInfo.carNo === 'undefined') {
+      this.get_parking_data()
+    }
   },
   mounted () {
   },
   destroyed () {
   },
   methods: {
+    ...mapMutations([
+      'get_user_info',
+      'get_parking_data'
+    ]),
     switchPayMethod (method) {
       this.payMethod = method
+    },
+    doPay () {
+      switch (this.payMethod) {
+        case 'score':
+          this.payByScore()
+          break
+        case 'weixin':
+          this.payByWeiXin()
+          break
+        default:
+          break
+      }
+    },
+    payByScore () {
+      if (this.paying) {
+        return false
+      }
+      this.$vux.loading.show({
+        text: '支付中'
+      })
+      this.paying = true
+
+      let postData = {
+        consumepoint: this.parkingInfo.fee,
+        memberId: this.userInfo.memberId,
+        operator: this.userInfo.memberId,
+        type: 2
+      }
+
+      this.$http.post(this.API.operationPoint, postData).then(res => {
+        this.$vux.loading.hide()
+        this.paying = false
+        if (res.return_code === '0000') {
+          this.$router.push('/pay_success')
+        } else {
+          this.$router.push('/pay_fail/' + res.return_message)
+        }
+      })
+    },
+    payByWeiXin () {
+      if (this.paying) {
+        return false
+      }
+      this.$vux.loading.show({
+        text: '支付中'
+      })
+      this.paying = true
+
+      let postData = {
+        tranAmt: this.parkingInfo.fee,
+        carNo: this.parkingInfo.carNo
+      }
+
+      this.$http.post(this.API.wxPay, postData).then(res => {
+        this.$vux.loading.hide()
+        this.paying = false
+        if (res.return_code === '0000') {
+          if (res.data.codeUrl) {
+            window.location.href = res.data.codeUrl
+          }
+        } else {
+          this.$router.push('/pay_fail/' + res.return_message)
+        }
+      })
     }
   }
 }
@@ -139,7 +219,7 @@ export default {
             color:rgba(255,255,255,1);
           }
           .licence {
-            width:74px;
+            /*width:74px;*/
             height:22px;
             font-size:16px;
             font-weight:500;
@@ -197,7 +277,8 @@ export default {
         text-align: left;
       }
       .methods {
-        height:182px;
+        /*height:182px;*/
+        height:122px;
         margin-top: 10px;
         background:rgba(255,255,255,1);
         ul {

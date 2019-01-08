@@ -3,6 +3,7 @@
     <div class="icon"><img src="../assets/img/img_fail@2x.png"/></div>
     <div class="title">支付失败</div>
     <div class="content">{{msg}}</div>
+    <div class="action" @click.stop="$router.push('/pay')">重新支付</div>
   </div>
 </template>
 
@@ -62,6 +63,19 @@ export default {
       font-weight:500;
       line-height:20px;
       color:rgba(51,51,51,1);
+    }
+    .action {
+      width:300px;
+      height:49px;
+      margin-top: 70px;
+      margin-left: 38px;
+      background:rgba(56,161,255,1);
+      border-radius:4px;
+      font-size:16px;
+      font-family:PingFang SC;
+      font-weight:500;
+      line-height:49px;
+      color:rgba(255,255,255,1);
     }
   }
 </style>

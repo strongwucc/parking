@@ -1,8 +1,10 @@
-// 用户信息
-import user from './user'
-const user_module = {
-  ...user
+// 公共数据模块
+import common_data from './common'
+
+const common_module = {
+  ...common_data
 }
+
 export default {
-  user_module
+  common_module
 }

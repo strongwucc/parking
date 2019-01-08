@@ -12,13 +12,13 @@ let oauthUrl = 'http://wxgw.yklsh.etonepay.com/authorize?etone_id=yt6eb45ebc3375
 let baseRedirectUrl = 'http://' + window.location.host + '/#'
 
 if (process.env.NODE_ENV === 'development') {
-  rootUrl = 'http://ceshi4.sdykt.com.cn:1280'
-  baseUrl = rootUrl + '/invoice-api/'
+  rootUrl = 'http://yanshi.yklsq.etonepay.com'
+  baseUrl = rootUrl + '/api-o2o/member/'
   baseRedirectUrl = 'http://' + window.location.host + '/#'
 } else if (process.env.NODE_ENV === 'production') {
   rootUrl = 'http://ceshi4.sdykt.com.cn:1280'
-  baseUrl = rootUrl + '/invoice-api/'
-  baseRedirectUrl = 'http://' + window.location.host + '/invoice/#'
+  baseUrl = rootUrl + '/api-o2o/member/'
+  baseRedirectUrl = 'http://' + window.location.host + '/parking/#'
 }
 
 export {
