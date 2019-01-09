@@ -17,31 +17,36 @@
         <ul>
           <li>
             <div class="label">停车场</div>
-            <div class="content">万达停车场</div>
+            <div class="content">{{orderDetail.payInfo.parkingName}}</div>
           </li>
           <li>
             <div class="label">车牌号</div>
-            <div class="content">{{parkingInfo.carNo}}</div>
+            <div class="content">{{orderDetail.payInfo.carNo}}</div>
           </li>
           <li>
             <div class="label">支付方式</div>
-            <div class="content">积分支付400积分</div>
+            <div class="content">
+              {{payType}}
+            </div>
           </li>
           <li>
             <div class="label">付款时间</div>
-            <div class="content">2018-05-02 11:24:27</div>
+            <div class="content">
+              <template v-if="orderDetail.tranTime">{{orderDetail.tranTime}}</template>
+              <template v-if="orderDetail.addtime">{{orderDetail.addtime}}</template>
+            </div>
           </li>
           <li v-show="showMore">
             <div class="label">停车时长</div>
-            <div class="content">{{parkingInfo.minutes|minuteFormat}}</div>
+            <div class="content">{{orderDetail.payInfo.minutes|minuteFormat}}</div>
           </li>
           <li v-show="showMore">
             <div class="label">进场时间</div>
-            <div class="content">{{parkingInfo.inTime}}</div>
+            <div class="content">{{orderDetail.payInfo.inTime}}</div>
           </li>
           <li v-show="showMore">
             <div class="label">离场时间</div>
-            <div class="content">{{parkingInfo.outTime}}</div>
+            <div class="content">{{orderDetail.payInfo.outTime}}</div>
           </li>
         </ul>
       </div>
@@ -65,7 +70,26 @@ export default {
   data () {
     return {
       orderId: '',
-      orderDetail: {},
+      queryId: '',
+      payType: '积分支付',
+      orderDetail: {
+        orderNo: '',
+        mchId: '',
+        shopNo: '',
+        payAmount: '',
+        payType: '',
+        scanPayType: '',
+        payResult: '',
+        payInfo: {
+          inTime: '',
+          carNo: '',
+          minutes: '',
+          fee: '',
+          outTime: '',
+          parkingName: ''
+        },
+        tranTime: ''
+      },
       showMore: false
     }
   },
@@ -90,9 +114,13 @@ export default {
     }
   },
   mounted () {
-    if (this.$route.params.orderId) {
-      this.orderId = this.$route.params.orderId
+    if (this.$route.query.orderId) {
+      this.orderId = this.$route.query.orderId
       this.queryOrderDetail()
+    }
+    if (this.$route.query.queryId) {
+      this.queryId = this.$route.query.queryId
+      this.queryPointDetail()
     }
   },
   destroyed () {
@@ -112,6 +140,23 @@ export default {
         this.paying = false
         if (res.return_code === '0000') {
           this.orderDetail = res.data
+          this.payType = '微信支付'
+        } else {
+          this.$router.push('/pay_fail/' + res.return_message)
+        }
+      })
+    },
+    queryPointDetail () {
+      let postData = {
+        operationScoreId: this.queryId
+      }
+
+      this.$http.post(this.API.queryPointDetail, postData).then(res => {
+        this.$vux.loading.hide()
+        this.paying = false
+        if (res.return_code === '0000') {
+          this.orderDetail = res.data
+          this.payType = '积分支付' + res.data.consumePoint + '积分'
         } else {
           this.$router.push('/pay_fail/' + res.return_message)
         }

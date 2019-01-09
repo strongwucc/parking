@@ -16,7 +16,7 @@ if (process.env.NODE_ENV === 'development') {
   baseUrl = rootUrl + '/api-o2o/member/'
   baseRedirectUrl = 'http://' + window.location.host + '/#'
 } else if (process.env.NODE_ENV === 'production') {
-  rootUrl = 'http://ceshi4.sdykt.com.cn:1280'
+  rootUrl = 'http://yanshi.yklsq.etonepay.com'
   baseUrl = rootUrl + '/api-o2o/member/'
   baseRedirectUrl = 'http://' + window.location.host + '/parking/#'
 }

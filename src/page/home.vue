@@ -25,8 +25,8 @@
       <div class="rule-notice">停车费</div>
       <div class="rule-content">
         <ul>
-          <li><span class="rule-icon"></span><span>首2小时内免费，超出部分20元/小时</span></li>
-          <li><span class="rule-icon"></span><span>200积分＝1小时</span></li>
+          <li><span class="rule-icon"></span><span>首<span class="red">{{parkingRules.freehours}}</span>小时内免费，超出部分<span class="red">{{parkingRules.moneyEachHour}}</span>元/小时</span></li>
+          <li><span class="rule-icon"></span><span><span class="red">{{parkingRules.integralDeductionEachHour}}</span>积分＝1小时</span></li>
         </ul>
       </div>
     </div>
@@ -44,6 +44,7 @@ export default {
   inject: ['reload'], // 引入方法
   data () {
     return {
+      parkingId: '',
       puttingIndex: 0,
       electric: false,
       licenceViewVisible: false,
@@ -62,6 +63,7 @@ export default {
   },
   computed: {
     ...mapState({
+      parkingRules: state => state.common.common_data.parking_rule
     }),
     queryActive: function () {
       let active = true
@@ -86,6 +88,11 @@ export default {
       userInfo.point = this.$route.query.point
     }
     this.set_user_info(userInfo)
+
+    if (this.$route.query.parkingId) {
+      this.parkingId = this.$route.query.parkingId
+      this.initQuery()
+    }
   },
   mounted () {
   },
@@ -94,7 +101,8 @@ export default {
   methods: {
     ...mapMutations([
       'set_user_info',
-      'set_parking_info'
+      'set_parking_info',
+      'set_parking_rule'
     ]),
     switchElectric () {
       this.electric = true
@@ -129,6 +137,20 @@ export default {
           this.licence[this.puttingIndex] = ''
         }
       }
+    },
+    initQuery () {
+      this.$http.post(this.API.queryParkingRule, {parkingId: this.parkingId}).then(res => {
+        if (res.return_code === '0000') {
+          this.set_parking_rule(res.data)
+        } else {
+          this.$vux.toast.show({
+            type: 'text',
+            text: '停车场信息查询失败',
+            width: '200px',
+            position: 'middle'
+          })
+        }
+      })
     },
     doQuery () {
       if (this.querying) {
@@ -306,6 +328,9 @@ export default {
               background-color: #DDDDDD;
               border-radius: 2px;
               margin-right: 5px;
+            }
+            .red {
+              color: #FF6A59;
             }
           }
         }

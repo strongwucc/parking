@@ -23,7 +23,7 @@
             <div class="icon"><img src="../assets/img/icon_jifen@2x.png"/></div>
             <div class="intro">
               <div class="notice">积分抵扣</div>
-              <div class="sub-notice">200积分=1小时，当前可用{{userInfo.point}}积分</div>
+              <div class="sub-notice">200积分=1小时，当前可用<span class="red">{{userInfo.point}}</span>积分</div>
             </div>
             <div class="check-icon" @click.stop="switchPayMethod('score')">
               <img v-if="payMethod === 'score'" src="../assets/img/radio_default@2x.png"/>
@@ -106,7 +106,8 @@ export default {
   methods: {
     ...mapMutations([
       'get_user_info',
-      'get_parking_data'
+      'get_parking_data',
+      'set_common_data_parking_rule'
     ]),
     switchPayMethod (method) {
       this.payMethod = method
@@ -133,17 +134,18 @@ export default {
       this.paying = true
 
       let postData = {
-        consumepoint: this.parkingInfo.fee,
-        memberId: this.userInfo.memberId,
+        consumePoint: this.parkingInfo.fee * 100,
+        platformMemberId: this.userInfo.memberId,
         operator: this.userInfo.memberId,
-        type: 2
+        type: 2,
+        carNo: this.parkingInfo.carNo
       }
 
       this.$http.post(this.API.operationPoint, postData).then(res => {
         this.$vux.loading.hide()
         this.paying = false
         if (res.return_code === '0000') {
-          this.$router.push('/pay_success')
+          this.$router.push('/pay_success?queryId=' + res.data.operationScoreId)
         } else {
           this.$router.push('/pay_fail/' + res.return_message)
         }
@@ -167,7 +169,7 @@ export default {
         this.$vux.loading.hide()
         this.paying = false
         if (res.return_code === '0000') {
-          if (res.data.codeUrl) {
+          if (res.data && typeof res.data.codeUrl === 'string') {
             window.location.href = res.data.codeUrl
           }
         } else {
@@ -312,6 +314,9 @@ export default {
                 font-weight:500;
                 line-height:17px;
                 color:rgba(102,102,102,1);
+                .red {
+                  color: #FF6A59;
+                }
               }
             }
             .check-icon {

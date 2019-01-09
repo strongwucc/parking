@@ -1,5 +1,5 @@
 export default {
-  set_common_data_parking_rule: (state, data) => {
+  set_parking_rule: (state, data) => {
     state.common_data.parking_rule = data
     localStorage.setItem('parking_rule', JSON.stringify(data))
   }

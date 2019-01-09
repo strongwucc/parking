@@ -37,7 +37,7 @@ export default new Router({
     },
 
     {
-      path: '/pay_success/:orderId',
+      path: '/pay_success',
       name: 'pay_success',
       component: PaySuccess,
       meta: {

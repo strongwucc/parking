@@ -35,7 +35,7 @@
     }
     var redirect_url = './index.html#/';
     if(args.merOrderNum){
-        redirect_url += 'pay_success/'+args.merOrderNum;
+        redirect_url += 'pay_success?orderId='+args.merOrderNum;
     } else {
         redirect_url += 'pay_success/支付出错啦';
     }
