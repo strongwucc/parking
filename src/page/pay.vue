@@ -56,10 +56,15 @@
     </div>
     <div class="action-area">
       <div class="amount">
-        <span>需付金额：</span>
-        <span class="money">￥{{parkingInfo.fee}}</span>
+        <span v-if="payMethod === 'score'">需抵扣：</span>
+        <span v-else-if="payMethod === 'weixin'">需付金额：</span>
+        <span class="money" v-if="payMethod === 'score'">{{parkingInfo.needPoint}}<span>积分</span></span>
+        <span class="money" v-else-if="payMethod === 'weixin'">￥{{parkingInfo.fee}}</span>
       </div>
-      <div class="action" @click.stop="doPay">确认支付</div>
+      <div class="action" @click.stop="doPay">
+        <template v-if="payMethod === 'score'">确认抵扣</template>
+        <template v-else-if="payMethod === 'weixin'">确认支付</template>
+      </div>
     </div>
   </div>
 </template>
@@ -385,6 +390,9 @@ export default {
           font-size:20px;
           font-weight:500;
           color:rgba(255,106,89,1);
+          span {
+            font-size: 14px;
+          }
         }
       }
       .action {

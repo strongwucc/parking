@@ -1,7 +1,7 @@
 <template>
   <div class="fail-page">
     <div class="icon"><img src="../assets/img/img_fail@2x.png"/></div>
-    <div class="title">支付失败</div>
+    <div class="title">失败</div>
     <div class="content">{{msg}}</div>
     <div class="action" v-if="buttonType == 0" @click.stop="$router.push('/pay')">重新支付</div>
     <div class="action" v-else-if="buttonType == 1" @click.stop="$router.push('/pay_success?queryId=' + queryId)">查看详情</div>
