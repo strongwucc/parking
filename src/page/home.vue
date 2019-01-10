@@ -63,6 +63,7 @@ export default {
   },
   computed: {
     ...mapState({
+      userInfo: state => state.user.user_info,
       parkingRules: state => state.common.common_data.parking_rule
     }),
     queryActive: function () {
@@ -170,7 +171,7 @@ export default {
         licence += this.licence[i]
       }
 
-      this.$http.post(this.API.queryMyCarFee, {carNo: licence}).then(res => {
+      this.$http.post(this.API.queryMyCarFee, {carNo: licence, platformMemberId: this.userInfo.memberId}).then(res => {
         this.$vux.loading.hide()
         this.querying = false
         if (res.return_code === '0000') {

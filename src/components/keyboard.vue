@@ -47,7 +47,17 @@ export default {
   },
   props: {
     visible: false,
-    electric: false
+    electric: false,
+    puttingIndex: 0
+  },
+  watch: {
+    puttingIndex: {
+      handler (newValue, oldValue) {
+        if (newValue > 0) {
+          this.type = 1
+        }
+      }
+    }
   },
   methods: {
     touchStart (index) {

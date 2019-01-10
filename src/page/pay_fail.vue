@@ -3,7 +3,9 @@
     <div class="icon"><img src="../assets/img/img_fail@2x.png"/></div>
     <div class="title">支付失败</div>
     <div class="content">{{msg}}</div>
-    <div class="action" @click.stop="$router.push('/pay')">重新支付</div>
+    <div class="action" v-if="buttonType == 0" @click.stop="$router.push('/pay')">重新支付</div>
+    <div class="action" v-else-if="buttonType == 1" @click.stop="$router.push('/pay_success?queryId=' + queryId)">查看详情</div>
+    <div class="action" v-else-if="buttonType == 2" @click.stop="$router.push('/pay_success?orderId=' + queryId)">查看详情</div>
   </div>
 </template>
 
@@ -15,6 +17,8 @@ export default {
   inject: ['reload'], // 引入方法
   data () {
     return {
+      buttonType: 0,
+      queryId: '',
       msg: '支付失败啦'
     }
   },
@@ -27,6 +31,12 @@ export default {
   mounted () {
     if (this.$route.params.error) {
       this.msg = this.$route.params.error
+    }
+    if (this.$route.query.type) {
+      this.buttonType = this.$route.query.type
+    }
+    if (this.$route.query.queryId) {
+      this.queryId = this.$route.query.queryId
     }
   },
   destroyed () {

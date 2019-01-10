@@ -19,24 +19,24 @@
       <div class="title">选择支付方式</div>
       <div class="methods">
         <ul>
-          <li>
+          <li @click.stop="switchPayMethod('score')">
             <div class="icon"><img src="../assets/img/icon_jifen@2x.png"/></div>
             <div class="intro">
               <div class="notice">积分抵扣</div>
-              <div class="sub-notice">200积分=1小时，当前可用<span class="red">{{userInfo.point}}</span>积分</div>
+              <div class="sub-notice">需要支付<span class="red">{{parkingInfo.needPoint}}</span>积分，当前可用<span class="red">{{userInfo.point}}</span>积分</div>
             </div>
-            <div class="check-icon" @click.stop="switchPayMethod('score')">
+            <div class="check-icon">
               <img v-if="payMethod === 'score'" src="../assets/img/radio_default@2x.png"/>
               <img v-else src="../assets/img/radio_gray@2x.png"/>
             </div>
           </li>
-          <li>
+          <li @click.stop="switchPayMethod('weixin')">
             <div class="icon"><img src="../assets/img/icon_weixin@2x.png"/></div>
             <div class="intro">
               <div class="notice">微信支付</div>
               <div class="sub-notice"></div>
             </div>
-            <div class="check-icon" @click.stop="switchPayMethod('weixin')">
+            <div class="check-icon">
               <img v-if="payMethod === 'weixin'" src="../assets/img/radio_default@2x.png"/>
               <img v-else src="../assets/img/radio_gray@2x.png"/>
             </div>
@@ -134,7 +134,7 @@ export default {
       this.paying = true
 
       let postData = {
-        consumePoint: this.parkingInfo.fee * 100,
+        consumePoint: this.parkingInfo.needPoint,
         platformMemberId: this.userInfo.memberId,
         operator: this.userInfo.memberId,
         type: 2,
@@ -146,8 +146,15 @@ export default {
         this.paying = false
         if (res.return_code === '0000') {
           this.$router.push('/pay_success?queryId=' + res.data.operationScoreId)
+        } else if (res.return_code === '6666' && res.data.operationScoreId) {
+          this.$router.push('/pay_fail/' + res.return_message + '?type=1&queryId=' + res.data.operationScoreId)
         } else {
-          this.$router.push('/pay_fail/' + res.return_message)
+          this.$vux.toast.show({
+            type: 'text',
+            text: res.return_message,
+            width: '200px',
+            position: 'middle'
+          })
         }
       })
     },
@@ -172,6 +179,8 @@ export default {
           if (res.data && typeof res.data.codeUrl === 'string') {
             window.location.href = res.data.codeUrl
           }
+        } else if (res.return_code === '6666' && res.data.orderNo) {
+          this.$router.push('/pay_fail/' + res.return_message + '?type=1&queryId=' + res.data.orderNo)
         } else {
           this.$router.push('/pay_fail/' + res.return_message)
         }
