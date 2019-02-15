@@ -153,6 +153,8 @@ export default {
           this.$router.push('/pay_success?queryId=' + res.data.operationScoreId)
         } else if (res.return_code === '6666' && res.data.operationScoreId) {
           this.$router.push('/pay_fail/' + res.return_message + '?type=1&queryId=' + res.data.operationScoreId)
+        } else if (res.return_code === '6666' && res.data.orderNo) {
+          this.$router.push('/pay_fail/' + res.return_message + '?type=2&queryId=' + res.data.orderNo)
         } else {
           this.$vux.toast.show({
             type: 'text',
@@ -174,7 +176,8 @@ export default {
 
       let postData = {
         tranAmt: this.parkingInfo.fee,
-        carNo: this.parkingInfo.carNo
+        carNo: this.parkingInfo.carNo,
+        memberId: this.userInfo.memberId
       }
 
       this.$http.post(this.API.wxPay, postData).then(res => {
@@ -184,8 +187,10 @@ export default {
           if (res.data && typeof res.data.codeUrl === 'string') {
             window.location.href = res.data.codeUrl
           }
+        } else if (res.return_code === '6666' && res.data.operationScoreId) {
+          this.$router.push('/pay_fail/' + res.return_message + '?type=1&queryId=' + res.data.operationScoreId)
         } else if (res.return_code === '6666' && res.data.orderNo) {
-          this.$router.push('/pay_fail/' + res.return_message + '?type=1&queryId=' + res.data.orderNo)
+          this.$router.push('/pay_fail/' + res.return_message + '?type=2&queryId=' + res.data.orderNo)
         } else {
           this.$router.push('/pay_fail/' + res.return_message)
         }
